@@ -1,0 +1,9 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "fantale-nextjs/package.json",
+      "use": "@vercel/next"
+    }
+  ]
+}

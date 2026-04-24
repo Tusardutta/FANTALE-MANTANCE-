@@ -1,0 +1,14 @@
+{
+  "name": "fantale-maintenance-monorepo",
+  "private": true,
+  "workspaces": [
+    "app",
+    "fantale-nextjs"
+  ],
+  "scripts": {
+    "dev": "cd fantale-nextjs && npm run dev",
+    "build": "cd fantale-nextjs && npm run build",
+    "start": "cd fantale-nextjs && npm run start",
+    "lint": "cd app && npm run lint"
+  }
+}
