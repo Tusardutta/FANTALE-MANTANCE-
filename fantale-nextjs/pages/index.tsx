@@ -1,0 +1,425 @@
+import Head from 'next/head';
+
+export default function MaintenancePage() {
+  return (
+    <>
+      <Head>
+        <title>FANTALE — System Under Maintenance</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link
+          href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700&family=Inter:wght@400;500&family=JetBrains+Mono:wght@400&display=swap"
+          rel="stylesheet"
+        />
+      </Head>
+
+      <style jsx global>{`
+        /* ── CSS Reset ── */
+        *, *::before, *::after {
+          margin: 0;
+          padding: 0;
+          box-sizing: border-box;
+        }
+
+        /* ── Design Tokens ── */
+        :root {
+          --bg-primary: #08080c;
+          --bg-card: rgba(12, 12, 22, 0.72);
+          --cyan-primary: #00f0ff;
+          --cyan-glow: rgba(0, 240, 255, 0.6);
+          --pink-primary: #ff2d95;
+          --pink-glow: rgba(255, 45, 149, 0.5);
+          --purple-primary: #a855f7;
+          --text-primary: #e8e8f0;
+          --text-secondary: #6b7280;
+
+          --font-display: 'Orbitron', 'Share Tech Mono', 'Courier New', monospace;
+          --font-body: 'Inter', 'Segoe UI', system-ui, sans-serif;
+          --font-terminal: 'JetBrains Mono', 'Fira Code', 'Courier New', monospace;
+
+          --glow-text-cyan: 0 0 10px var(--cyan-glow),
+                            0 0 40px rgba(0, 240, 255, 0.4),
+                            0 0 80px rgba(0, 240, 255, 0.2);
+          --glow-card: 0 0 25px rgba(255, 45, 149, 0.35),
+                       0 0 70px rgba(255, 45, 149, 0.12),
+                       inset 0 0 30px rgba(255, 45, 149, 0.05);
+
+          --ease-glow: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+          --ease-smooth: cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        html, body {
+          width: 100%;
+          height: 100%;
+          overflow: hidden;
+          background: var(--bg-primary);
+          font-family: var(--font-body);
+          color: var(--text-primary);
+          -webkit-font-smoothing: antialiased;
+          -moz-osx-font-smoothing: grayscale;
+        }
+
+        #__next {
+          width: 100%;
+          height: 100%;
+        }
+      `}</style>
+
+      <style jsx>{`
+        .bg-layer {
+          position: fixed;
+          inset: 0;
+          background: var(--bg-primary);
+          z-index: 0;
+        }
+
+        .orb {
+          position: fixed;
+          border-radius: 50%;
+          pointer-events: none;
+          will-change: transform;
+        }
+
+        .orb-cyan {
+          width: 400px;
+          height: 400px;
+          top: 15%;
+          left: 20%;
+          background: rgba(0, 240, 255, 0.06);
+          filter: blur(120px);
+          animation: orbDrift1 20s ease-in-out infinite alternate;
+        }
+
+        .orb-pink {
+          width: 450px;
+          height: 450px;
+          bottom: 20%;
+          right: 15%;
+          background: rgba(255, 45, 149, 0.05);
+          filter: blur(130px);
+          animation: orbDrift2 18s ease-in-out infinite alternate;
+          animation-delay: 2s;
+        }
+
+        .orb-purple {
+          width: 350px;
+          height: 350px;
+          top: 30%;
+          left: 50%;
+          transform: translateX(-50%);
+          background: rgba(168, 85, 247, 0.05);
+          filter: blur(100px);
+          animation: orbDrift3 22s ease-in-out infinite alternate;
+          animation-delay: 4s;
+        }
+
+        @keyframes orbDrift1 {
+          0%   { transform: translate(0, 0); }
+          100% { transform: translate(30px, 20px); }
+        }
+
+        @keyframes orbDrift2 {
+          0%   { transform: translate(0, 0); }
+          100% { transform: translate(-25px, -25px); }
+        }
+
+        @keyframes orbDrift3 {
+          0%   { transform: translateX(-50%) translateY(0); }
+          100% { transform: translateX(-50%) translateY(-20px); }
+        }
+
+        .noise-overlay {
+          position: fixed;
+          inset: 0;
+          z-index: 9999;
+          pointer-events: none;
+          opacity: 0.05;
+          mix-blend-mode: overlay;
+        }
+
+        .noise-overlay::before {
+          content: '';
+          position: absolute;
+          inset: 0;
+          background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+          background-repeat: repeat;
+          background-size: 256px 256px;
+        }
+
+        .scanline {
+          position: fixed;
+          inset: 0;
+          z-index: 50;
+          pointer-events: none;
+          overflow: hidden;
+        }
+
+        .scanline::before {
+          content: '';
+          position: absolute;
+          left: 0;
+          width: 100%;
+          height: 2px;
+          background: linear-gradient(
+            90deg,
+            transparent 0%,
+            rgba(0, 240, 255, 0.12) 20%,
+            rgba(255, 255, 255, 0.18) 50%,
+            rgba(0, 240, 255, 0.12) 80%,
+            transparent 100%
+          );
+          animation: scanlineSweep 8s linear infinite;
+          box-shadow: 0 0 6px rgba(0, 240, 255, 0.15);
+        }
+
+        @keyframes scanlineSweep {
+          0%   { top: -2px; }
+          100% { top: 100vh; }
+        }
+
+        .vignette {
+          position: fixed;
+          inset: 0;
+          z-index: 5;
+          pointer-events: none;
+          background: radial-gradient(
+            ellipse at center,
+            transparent 0%,
+            transparent 50%,
+            rgba(0, 0, 0, 0.4) 100%
+          );
+        }
+
+        .main-container {
+          position: relative;
+          z-index: 10;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          min-height: 100vh;
+          padding: 2rem;
+        }
+
+        .maintenance-card {
+          position: relative;
+          width: 90%;
+          max-width: 640px;
+          padding: 3rem 3rem;
+          background: var(--bg-card);
+          backdrop-filter: blur(16px);
+          -webkit-backdrop-filter: blur(16px);
+          border: 1px solid rgba(255, 45, 149, 0.35);
+          border-radius: 12px;
+          box-shadow: var(--glow-card);
+          text-align: center;
+          overflow: hidden;
+
+          opacity: 0;
+          transform: translateY(30px) scale(0.98);
+          animation: cardEntrance 900ms var(--ease-smooth) 200ms forwards,
+                     borderPulse 3s var(--ease-glow) 1.1s infinite alternate;
+        }
+
+        @keyframes cardEntrance {
+          to {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+          }
+        }
+
+        @keyframes borderPulse {
+          0% {
+            border-color: rgba(255, 45, 149, 0.28);
+            box-shadow: 0 0 15px rgba(255, 45, 149, 0.2),
+                        0 0 45px rgba(255, 45, 149, 0.07),
+                        inset 0 0 25px rgba(255, 45, 149, 0.03);
+          }
+          100% {
+            border-color: rgba(255, 45, 149, 0.5);
+            box-shadow: 0 0 25px rgba(255, 45, 149, 0.4),
+                        0 0 75px rgba(255, 45, 149, 0.15),
+                        inset 0 0 35px rgba(255, 45, 149, 0.06);
+          }
+        }
+
+        .maintenance-card::before {
+          content: '';
+          position: absolute;
+          top: -50%;
+          left: -50%;
+          width: 200%;
+          height: 200%;
+          background: radial-gradient(
+            ellipse at 30% 20%,
+            rgba(0, 240, 255, 0.03) 0%,
+            transparent 50%
+          );
+          pointer-events: none;
+        }
+
+        .logo {
+          font-family: var(--font-display);
+          font-size: clamp(3rem, 10vw, 6rem);
+          font-weight: 700;
+          color: var(--cyan-primary);
+          letter-spacing: 0.3em;
+          text-transform: uppercase;
+          text-shadow: var(--glow-text-cyan);
+          margin-bottom: 1.5rem;
+          line-height: 1;
+        }
+
+        .divider {
+          width: 60px;
+          height: 2px;
+          margin: 0 auto 2rem;
+          background: linear-gradient(90deg, var(--cyan-primary), var(--pink-primary));
+          border-radius: 1px;
+          box-shadow: 0 0 10px rgba(0, 240, 255, 0.5),
+                      0 0 20px rgba(255, 45, 149, 0.3);
+        }
+
+        .subheading {
+          font-family: var(--font-display);
+          font-size: clamp(1.2rem, 4vw, 1.8rem);
+          font-weight: 500;
+          color: var(--text-primary);
+          letter-spacing: 0.15em;
+          text-transform: uppercase;
+          margin-bottom: 2rem;
+          line-height: 1.3;
+        }
+
+        .support-text {
+          font-family: var(--font-body);
+          font-size: 1rem;
+          font-weight: 400;
+          color: var(--text-secondary);
+          line-height: 1.7;
+          max-width: 420px;
+          margin: 0 auto 2.5rem;
+        }
+
+        .status-badge {
+          display: inline-flex;
+          align-items: center;
+          gap: 0.5rem;
+          padding: 0.45rem 1.1rem;
+          background: rgba(0, 240, 255, 0.08);
+          border: 1px solid rgba(0, 240, 255, 0.35);
+          border-radius: 20px;
+          font-family: var(--font-terminal);
+          font-size: 0.75rem;
+          color: var(--cyan-primary);
+          letter-spacing: 0.2em;
+          text-transform: uppercase;
+          margin-bottom: 2.5rem;
+          box-shadow: 0 0 10px rgba(0, 240, 255, 0.1);
+        }
+
+        .status-dot {
+          color: var(--cyan-primary);
+          font-size: 0.85rem;
+          animation: dotPulse 1.5s ease-in-out infinite;
+        }
+
+        @keyframes dotPulse {
+          0%, 100% { opacity: 1; }
+          50%      { opacity: 0.25; }
+        }
+
+        .terminal-footer {
+          font-family: var(--font-terminal);
+          font-size: 0.8rem;
+          color: var(--text-secondary);
+          opacity: 0.6;
+          letter-spacing: 0.05em;
+        }
+
+        @media (max-width: 480px) {
+          .maintenance-card {
+            padding: 2.5rem 1.5rem;
+          }
+
+          .logo {
+            letter-spacing: 0.2em;
+          }
+
+          .subheading {
+            letter-spacing: 0.1em;
+          }
+
+          .status-badge {
+            font-size: 0.7rem;
+            padding: 0.4rem 0.9rem;
+          }
+
+          .terminal-footer {
+            font-size: 0.7rem;
+          }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+          .orb,
+          .scanline::before,
+          .status-dot,
+          .maintenance-card {
+            animation: none !important;
+          }
+
+          .maintenance-card {
+            opacity: 1;
+            transform: none;
+          }
+        }
+      `}</style>
+
+      {/* Background */}
+      <div className="bg-layer" />
+
+      {/* Ambient Glow Orbs */}
+      <div className="orb orb-cyan" />
+      <div className="orb orb-pink" />
+      <div className="orb orb-purple" />
+
+      {/* Vignette */}
+      <div className="vignette" />
+
+      {/* Noise / Grain Overlay */}
+      <div className="noise-overlay" />
+
+      {/* Scanline */}
+      <div className="scanline" />
+
+      {/* Main Content */}
+      <div className="main-container">
+        <div className="maintenance-card">
+          {/* Logo */}
+          <h1 className="logo">FANTALE</h1>
+
+          {/* Divider */}
+          <div className="divider" />
+
+          {/* Subheading */}
+          <h2 className="subheading">System Under Maintenance</h2>
+
+          {/* Support Text */}
+          <p className="support-text">
+            We&apos;re currently upgrading the system for a better anime, manga, manhwa, and webnovel experience.
+            Please check back shortly.
+          </p>
+
+          {/* Status Badge */}
+          <div className="status-badge">
+            <span className="status-dot">&#9679;</span>
+            <span>Live Maintenance in Progress</span>
+          </div>
+
+          {/* Terminal Footer */}
+          <p className="terminal-footer">// Servers rebooting &bull; Database syncing &bull; Deploying updates</p>
+        </div>
+      </div>
+    </>
+  );
+}
